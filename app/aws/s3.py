@@ -10,3 +10,14 @@ s3 = boto3.client(
     "s3",
     region_name="us-east-1"
 )
+
+
+def upload_file(file, filename):
+
+    s3.upload_fileobj(
+        file,
+        bucket,
+        filename
+    )
+
+    return filename
