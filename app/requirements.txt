@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+boto3
+watchtower
+python-multipart
+jinja2
