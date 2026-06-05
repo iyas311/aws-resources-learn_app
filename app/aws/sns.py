@@ -8,3 +8,12 @@ sns = boto3.client(
 )
 
 topic = get_secret()["sns_topic_arn"]
+
+
+def publish_message(subject, message):
+
+    sns.publish(
+        TopicArn=topic,
+        Subject=subject,
+        Message=message
+    )
