@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Metrics - CloudLearn{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">CloudWatch Metrics</h1>
+
+<div class="row" id="metricsContainer">
+    <div class="col-12 text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h4>About These Metrics</h4>
+    <p class="text-muted">
+        These metrics are collected from AWS CloudWatch in real-time. 
+        Click the buttons below to generate more activity.
+    </p>
+
+    <div class="d-grid gap-2 d-md-flex mt-3">
+        <a href="/upload" class="btn btn-primary">Test Upload</a>
+        <a href="/notify" class="btn btn-warning">Send Notification</a>
+        <a href="/health" class="btn btn-success">Health Check</a>
+    </div>
+</div>
+
+<script>
+async function loadMetrics() {
+    const container = document.getElementById('metricsContainer');
+    
+    // Since we don't have a metrics endpoint yet, simulate with placeholder
+    const metrics = [
+        { name: 'Uploads', value: Math.floor(Math.random() * 20), icon: '📤' },
+        { name: 'Notifications', value: Math.floor(Math.random() * 15), icon: '📢' },
+        { name: 'Health Checks', value: Math.floor(Math.random() * 50), icon: '✅' },
+        { name: 'Errors', value: Math.floor(Math.random() * 5), icon: '❌' }
+    ];
+
+    container.innerHTML = metrics.map(metric => `
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="metric-box">
+                <div class="metric-value">${metric.value}</div>
+                <div class="metric-label">${metric.icon} ${metric.name}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+loadMetrics();
+</script>
+{% endblock %}

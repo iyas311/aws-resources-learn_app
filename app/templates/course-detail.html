@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Course Detail - CloudLearn{% endblock %}
+
+{% block content %}
+<div id="courseDetail">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<script>
+const courseId = window.location.pathname.split('/').pop();
+
+async function loadCourse() {
+    try {
+        const response = await fetch(`/api/course/${courseId}`);
+        const data = await response.json();
+        const course = data.course;
+
+        document.getElementById('courseDetail').innerHTML = `
+            <div class="row">
+                <div class="col-md-8">
+                    ${course.thumbnail ? `<img src="${course.thumbnail}" class="img-fluid rounded mb-4" alt="${course.title}" style="max-height: 400px; object-fit: cover;">` : ''}
+                    
+                    <h1 class="mb-2">${course.title}</h1>
+                    <p class="lead">By <strong>${course.instructor}</strong></p>
+                    
+                    <hr>
+                    
+                    <h4 class="mt-4">About This Course</h4>
+                    <p>${course.description}</p>
+
+                    <hr>
+
+                    <h4 class="mt-4">Course Material</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-muted mb-3">📄 ${course.material_name}</p>
+                            <a href="${course.material_url}" class="btn btn-primary btn-lg" download>
+                                ⬇️ Download Material
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Course Info</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Instructor:</strong> ${course.instructor}</li>
+                                <li><strong>Created:</strong> Today</li>
+                                <li><strong>Format:</strong> Self-paced</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <a href="/courses" class="btn btn-outline-primary btn-lg w-100 mt-3">
+                        ← Back to Courses
+                    </a>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        document.getElementById('courseDetail').innerHTML = `
+            <div class="alert alert-danger">
+                Error loading course: ${error.message}
+            </div>
+        `;
+    }
+}
+
+loadCourse();
+</script>
+{% endblock %}

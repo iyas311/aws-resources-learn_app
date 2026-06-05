@@ -1,43 +1,112 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>CloudLearn AWS Demo</title>
+{% extends "base.html" %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-</head>
+{% block title %}Home - CloudLearn{% endblock %}
 
-<body class="bg-light">
-
-<div class="container mt-5">
-
-    <h1 class="mb-4">
-        CloudLearn AWS Demo
-    </h1>
-
-    <div class="card p-4 shadow">
-
-        <h4>AWS Services Demo</h4>
-
-        <div class="mt-3">
-
-            <a href="/health" class="btn btn-success">
-                Health Check
-            </a>
-
-            <a href="/notify" class="btn btn-warning">
-                Send SNS Notification
-            </a>
-
-            <a href="/log" class="btn btn-info">
-                Create CloudWatch Log
-            </a>
-
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-4">Welcome to CloudLearn</h1>
+        <p class="lead">Learn AWS with hands-on course materials.</p>
+        
+        <div class="mt-5">
+            <h3 class="mb-3">Recent Courses</h3>
+            <div class="row" id="courseList">
+                <div class="col-12 text-center text-muted">
+                    Loading courses...
+                </div>
+            </div>
         </div>
-
     </div>
 
+    <div class="col-lg-4">
+        <h4 class="mb-3">System Health</h4>
+        <div id="healthStatus">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Quick Actions</h4>
+        <div class="d-grid gap-2">
+            <a href="/upload-course" class="btn btn-primary btn-lg">
+                📤 Upload Course
+            </a>
+            <a href="/courses" class="btn btn-outline-primary btn-lg">
+                📚 View All Courses
+            </a>
+            <button onclick="sendNotification()" class="btn btn-outline-primary btn-lg">
+                📢 Send Test Notification
+            </button>
+        </div>
+    </div>
 </div>
 
-</body>
-</html>
+<script>
+async function loadCourses() {
+    try {
+        const response = await fetch('/api/courses');
+        const data = await response.json();
+        const courseList = document.getElementById('courseList');
+        
+        if (data.courses.length === 0) {
+            courseList.innerHTML = '<div class="col-12 text-center text-muted">No courses yet. <a href="/upload-course">Create one!</a></div>';
+            return;
+        }
+
+        courseList.innerHTML = data.courses.map((course, index) => `
+            <div class="col-md-6 mb-3">
+                <div class="card course-card">
+                    ${course.thumbnail ? `<img src="${course.thumbnail}" class="card-img-top" alt="${course.title}">` : ''}
+                    <div class="card-body">
+                        <h5 class="card-title">${course.title}</h5>
+                        <p class="card-text">${course.description}</p>
+                        <p class="small text-muted">Instructor: ${course.instructor}</p>
+                        <a href="/course/${index}" class="btn btn-light btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading courses:', error);
+    }
+}
+
+async function checkHealth() {
+    try {
+        const response = await fetch('/health');
+        const data = await response.json();
+        document.getElementById('healthStatus').innerHTML = `
+            <div class="health-badge healthy">
+                ✅ All Systems Operational
+            </div>
+            <p class="small mt-3">
+                <strong>Services:</strong><br>
+                ✅ S3<br>
+                ✅ SNS<br>
+                ✅ Secrets Manager<br>
+                ✅ CloudWatch
+            </p>
+        `;
+    } catch (error) {
+        document.getElementById('healthStatus').innerHTML = `
+            <div class="health-badge unhealthy">
+                ❌ System Unhealthy
+            </div>
+        `;
+    }
+}
+
+async function sendNotification() {
+    try {
+        const response = await fetch('/notify');
+        const data = await response.json();
+        alert('✅ Notification sent successfully!');
+    } catch (error) {
+        alert('❌ Failed to send notification');
+    }
+}
+
+loadCourses();
+checkHealth();
+</script>
+{% endblock %}

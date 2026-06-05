@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Course - CloudLearn{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Upload New Course</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form id="courseForm" enctype="multipart/form-data" onsubmit="handleSubmit(event)">
+            <div class="mb-3">
+                <label for="title" class="form-label">Course Title *</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description *</label>
+                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="instructor" class="form-label">Instructor Name *</label>
+                <input type="text" class="form-control" id="instructor" name="instructor" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="thumbnail" class="form-label">Thumbnail Image</label>
+                <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                <small class="text-muted">JPG, PNG (max 5MB)</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="material" class="form-label">Course Material *</label>
+                <input type="file" class="form-control" id="material" name="material" required>
+                <small class="text-muted">PDF, ZIP, or any file (max 100MB)</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">
+                📤 Upload Course
+            </button>
+            <a href="/courses" class="btn btn-outline-secondary btn-lg">
+                Cancel
+            </a>
+        </form>
+
+        <div id="successMessage" class="alert alert-success mt-3" style="display:none;">
+            ✅ Course uploaded successfully! <a href="/courses">View all courses</a>
+        </div>
+
+        <div id="errorMessage" class="alert alert-danger mt-3" style="display:none;"></div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Upload Guidelines</h5>
+                <ul class="small">
+                    <li>Title is required</li>
+                    <li>Description helps students find your course</li>
+                    <li>Include your instructor name</li>
+                    <li>Thumbnail should be a course preview image</li>
+                    <li>Material can be PDF, ZIP, or any format</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function handleSubmit(event) {
+    event.preventDefault();
+
+    const formData = new FormData(document.getElementById('courseForm'));
+    
+    try {
+        const response = await fetch('/api/upload-course', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('courseForm').reset();
+            setTimeout(() => {
+                window.location.href = '/courses';
+            }, 2000);
+        } else {
+            const error = await response.json();
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorMessage').textContent = error.detail || 'Upload failed';
+        }
+    } catch (error) {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').textContent = 'Error uploading course: ' + error.message;
+    }
+}
+</script>
+{% endblock %}

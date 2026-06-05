@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - CloudLearn{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="mb-2">All Courses</h1>
+    <a href="/upload-course" class="btn btn-primary">📤 Upload New Course</a>
+</div>
+
+<div id="coursesList" class="row">
+    <div class="col-12 text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadAllCourses() {
+    try {
+        const response = await fetch('/api/courses');
+        const data = await response.json();
+        const coursesList = document.getElementById('coursesList');
+
+        if (data.courses.length === 0) {
+            coursesList.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No courses yet. <a href="/upload-course">Upload your first course!</a>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        coursesList.innerHTML = data.courses.map((course, index) => `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card course-card h-100">
+                    ${course.thumbnail ? `<img src="${course.thumbnail}" class="card-img-top" alt="${course.title}" style="height: 200px; object-fit: cover;">` : '<div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>'}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${course.title}</h5>
+                        <p class="card-text flex-grow-1">${course.description}</p>
+                        <p class="card-text"><small>By ${course.instructor}</small></p>
+                        <a href="/course/${index}" class="btn btn-light btn-sm">
+                            👁️ View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        document.getElementById('coursesList').innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    Error loading courses: ${error.message}
+                </div>
+            </div>
+        `;
+    }
+}
+
+loadAllCourses();
+</script>
+{% endblock %}
