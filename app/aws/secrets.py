@@ -7,11 +7,12 @@ SECRET_NAME = "cloudlearn-app"
 def get_secret():
     """
     Fetch all secrets from Secrets Manager.
-    
+
     Contains:
     - S3 bucket_name
-    - PostgreSQL credentials (username, password, host, port, database)
-    
+    - SNS topic ARN
+    - PostgreSQL credentials (db_username, db_password, db_host, db_port, db_name)
+
     Returns:
         Dictionary with all secret values
     """
