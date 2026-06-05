@@ -40,9 +40,9 @@ async function loadCourse() {
                             <a href="${course.material_url}" class="btn btn-primary btn-lg" download>
                                 ⬇️ Download Material
                             </a>
-                        </div>
-                    </div>
-                </div>
+                    <button class="btn btn-outline-danger btn-lg ms-2" onclick="deleteCourse(${course.id})">
+                        🗑️ Delete Course
+                    </button>
 
                 <div class="col-md-4">
                     <div class="card">
@@ -68,6 +68,27 @@ async function loadCourse() {
                 Error loading course: ${error.message}
             </div>
         `;
+    }
+}
+
+async function deleteCourse(courseId) {
+    if (!confirm('Delete this course?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/course/${courseId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            window.location.href = '/courses';
+        } else {
+            const error = await response.json();
+            alert(error.detail || 'Delete failed');
+        }
+    } catch (error) {
+        alert('Delete failed: ' + error.message);
     }
 }
 

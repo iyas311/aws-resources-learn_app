@@ -42,9 +42,14 @@ async function loadAllCourses() {
                         <h5 class="card-title">${course.title}</h5>
                         <p class="card-text flex-grow-1">${course.description}</p>
                         <p class="card-text"><small>By ${course.instructor}</small></p>
-                        <a href="/course/${course.id}" class="btn btn-light btn-sm">
-                            👁️ View Details
-                        </a>
+                        <div class="d-flex justify-content-between gap-2">
+                            <a href="/course/${course.id}" class="btn btn-light btn-sm">
+                                👁️ View Details
+                            </a>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteCourse(${course.id})">
+                                🗑️ Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -57,6 +62,27 @@ async function loadAllCourses() {
                 </div>
             </div>
         `;
+    }
+}
+
+async function deleteCourse(courseId) {
+    if (!confirm('Delete this course?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/course/${courseId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            loadAllCourses();
+        } else {
+            const error = await response.json();
+            alert(error.detail || 'Delete failed');
+        }
+    } catch (error) {
+        alert('Delete failed: ' + error.message);
     }
 }
 

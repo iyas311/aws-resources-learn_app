@@ -42,6 +42,14 @@ def get_object(filename):
     )
 
 
+def delete_object(filename):
+
+    return s3.delete_object(
+        Bucket=bucket,
+        Key=filename
+    )
+
+
 def generate_presigned_url(filename, expires_in=300):
 
     return s3.generate_presigned_url(

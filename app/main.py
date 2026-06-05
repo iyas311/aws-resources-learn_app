@@ -10,7 +10,7 @@ from starlette.responses import HTMLResponse
 from sqlalchemy.orm import Session
 import os
 
-from app.aws.s3 import upload_file, list_files, get_object, generate_presigned_url
+from app.aws.s3 import upload_file, delete_object, list_files, get_object, generate_presigned_url
 from app.aws.sns import publish_message
 from app.aws.cloudwatch import logger
 from app.aws.metrics import put_metric
@@ -210,6 +210,29 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
             "created_at": course.created_at.isoformat() if course.created_at else None
         }
     }
+
+
+@app.delete("/api/course/{course_id}")
+def delete_course(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        return {"detail": "Course not found"}, 404
+
+    # Delete S3 objects if they exist
+    try:
+        if course.thumbnail:
+            delete_object(course.thumbnail)
+        delete_object(course.material)
+    except Exception as err:
+        logger.error(f"Failed to delete S3 objects for course {course_id}: {err}")
+
+    db.delete(course)
+    db.commit()
+
+    put_metric("Deletes")
+    logger.info(f"Course deleted: {course_id}")
+
+    return {"success": True}
 
 
 @app.post("/api/upload-course")
