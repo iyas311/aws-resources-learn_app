@@ -7,6 +7,7 @@ logger.setLevel(logging.INFO)
 
 logger.addHandler(
     watchtower.CloudWatchLogHandler(
-        log_group_name="/cloudlearn/application"
+        log_group_name="/cloudlearn/application",
+        region_name="us-east-1"
     )
 )

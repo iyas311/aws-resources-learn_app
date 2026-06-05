@@ -5,7 +5,10 @@ SECRET_NAME = "cloudlearn-app"
 
 def get_secret():
 
-    client = boto3.client("secretsmanager")
+    client = boto3.client(
+        "secretsmanager",
+        region_name="us-east-1"
+    )
 
     response = client.get_secret_value(
         SecretId=SECRET_NAME
