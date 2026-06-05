@@ -34,7 +34,7 @@ async function loadAllCourses() {
             return;
         }
 
-        coursesList.innerHTML = data.courses.map((course, index) => `
+        coursesList.innerHTML = data.courses.map((course) => `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card course-card h-100">
                     ${course.thumbnail ? `<img src="${course.thumbnail}" class="card-img-top" alt="${course.title}" style="height: 200px; object-fit: cover;">` : '<div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>'}
@@ -42,7 +42,7 @@ async function loadAllCourses() {
                         <h5 class="card-title">${course.title}</h5>
                         <p class="card-text flex-grow-1">${course.description}</p>
                         <p class="card-text"><small>By ${course.instructor}</small></p>
-                        <a href="/course/${index}" class="btn btn-light btn-sm">
+                        <a href="/course/${course.id}" class="btn btn-light btn-sm">
                             👁️ View Details
                         </a>
                     </div>

@@ -150,6 +150,11 @@ async def upload_course_page(request: Request):
     return templates.TemplateResponse("upload-course.html", {"request": request})
 
 
+@app.get("/upload", response_class=HTMLResponse)
+async def upload_alias(request: Request):
+    return templates.TemplateResponse("upload-course.html", {"request": request})
+
+
 @app.get("/course/{course_id}", response_class=HTMLResponse)
 async def course_detail_page(request: Request, course_id: int):
     return templates.TemplateResponse("course-detail.html", {"request": request})
