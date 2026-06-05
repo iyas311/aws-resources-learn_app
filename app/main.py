@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi import UploadFile
 from fastapi import File
+from fastapi.responses import StreamingResponse
 
-from app.aws.s3 import upload_file
+from app.aws.s3 import upload_file, list_files, get_object, generate_presigned_url
 from app.aws.sns import publish_message
 from app.aws.cloudwatch import logger
 from app.aws.metrics import put_metric
@@ -78,6 +79,33 @@ def notify():
         put_metric("Errors")
         logger.error(f"Notification failed: {str(e)}")
         raise
+
+
+@app.get("/files")
+def files():
+
+    return {
+        "files": list_files()
+    }
+
+
+@app.get("/view/{filename}")
+def view_file(filename: str):
+
+    obj = get_object(filename)
+
+    return StreamingResponse(
+        obj["Body"],
+        media_type=obj["ContentType"]
+    )
+
+
+@app.get("/view-url/{filename}")
+def view_url(filename: str):
+
+    return {
+        "url": generate_presigned_url(filename)
+    }
 
 
 @app.get("/log")
