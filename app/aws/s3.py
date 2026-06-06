@@ -14,11 +14,28 @@ s3 = boto3.client(
 
 def upload_file(file, filename):
 
-    s3.upload_fileobj(
-        file,
-        bucket,
-        filename
-    )
+    # Use SSE-KMS if a KMS key is provided in secrets
+    extra_args = {}
+    kms_key = secret.get("kms_key_id") or secret.get("kms_key")
+    if kms_key:
+        extra_args = {
+            "ServerSideEncryption": "aws:kms",
+            "SSEKMSKeyId": kms_key,
+        }
+
+    if extra_args:
+        s3.upload_fileobj(
+            file,
+            bucket,
+            filename,
+            ExtraArgs=extra_args
+        )
+    else:
+        s3.upload_fileobj(
+            file,
+            bucket,
+            filename
+        )
 
     return filename
 
